@@ -6,18 +6,24 @@ import java.util.*;
 public class Solution {
 
 	enum Result{
-		Lose,Tied,Win
+		Lose,Tied,Win;
+		Result oponentsResult() {
+			switch (this) {
+				case Lose:    return Win;
+				case Tied:    return Tied;
+				case Win:     return Lose;
+				default:      return null;   // should never happen
+			}
+		}
 	}
 	enum Move{
 		Rock("Rock"), Paper("Paper"), Scissors("Scissors"), Lizard("Lizard"), Spock("Spock");
-
 		private static HashMap<String,Move> hashMap=null;
 
 		String name;
 		Move(String move) {
 			this.name =move;
 		}
-
 		public String getName() {
 			return name;
 		}
@@ -33,7 +39,6 @@ public class Solution {
 			}
 			return hashMap;
 		}
-
 		public List<Move> loseTo(){
 			Move move=this;
 			ArrayList<Move> moves=new ArrayList<>();
@@ -67,94 +72,24 @@ public class Solution {
 			return moves;
 		}
 
-		public String shortname() {
-			Move m =this;
-			switch (m) {
-				case Rock: return "Ro";
-				case Paper: return "Pa";
-				case Scissors: return "Sc";
-				case Spock: return "Sp";
-				case Lizard: return "Li";
-			}
-			return null;
-		}
-
-
 		@Override
 		public String toString() {
 			return this.getName();
 		}
 	}
+	static BigInteger TWO = BigInteger.valueOf(2);
 
 	public static Result calcWinner(Move me,Move op){
 		if (me.equals(op)) return Result.Tied;
-
 		if (op.loseTo().contains(me)) return Result.Win;
 		return Result.Lose;
-//        switch (me) {
-//            case Rock:{
-//                if (op.equals(Move.Scissors)||op.equals(Move.Lizard))
-//                    return Result.Win;
-//                return Result.Lose;
-//            }
-//            case Paper:{
-//                if (op.equals(Move.Rock)||op.equals(Move.Spock))
-//                    return Result.Win;
-//                return Result.Lose;
-//            }
-//            case Scissors:{
-//                if (op.equals(Move.Paper)||op.equals(Move.Lizard))
-//                    return Result.Win;
-//                return Result.Lose;
-//            }
-//            case Spock:{
-//                if (op.equals(Move.Scissors)||op.equals(Move.Rock))
-//                    return Result.Win;
-//                return Result.Lose;
-//            }
-//            case Lizard:{
-//                if (op.equals(Move.Spock)||op.equals(Move.Paper))
-//                    return Result.Win;
-//                return Result.Lose;
-//            }
-//        }
-//        return null;
 	}
 
-
-	public static Move BobLogic(Move lastMove,Result result){
-		if (!lastMove.equals(Move.Spock)) return Move.Spock;
-		switch (result){
-			case Win:
-				return Move.Rock;
-			case Tied:
-				return Move.Lizard;
-			case Lose:
-				return Move.Paper;
-		}
-		return null;
-	}
-
-	public static Move AliceLogic(Move lastMove,Result result,Move opMove){
-		if (result.equals(Result.Win)) return lastMove;
-		List<Move> beatmoves =null;
-		switch (result) {
-			case Win:
-				return lastMove;
-			case Tied:{
-				beatmoves = lastMove.loseTo();
-				break;
-			}
-			case Lose:{
-				beatmoves = opMove.loseTo();
-			}
-		}
-		Result result1 = calcWinner(beatmoves.get(0), beatmoves.get(1));
-		if (result1.equals(Result.Win)) return beatmoves.get(0);
-		else return beatmoves.get(1);
-	}
-
-	public static void printwin(BigInteger alicewin,BigInteger bobwin,BigInteger ties){
+	public static void printGameWinner(){
+		BigInteger alicewin, bobwin, ties;
+		alicewin = getResultCount(Result.Win);
+		bobwin = getResultCount(Result.Lose);
+		ties = getResultCount(Result.Tied);
 		if (bobwin.compareTo(alicewin)<0)
 			System.out.printf("%s wins, by winning %d game(s) and tying %d game(s)\n","Alice",alicewin,ties);
 		else if (alicewin.compareTo(bobwin)<0)
@@ -163,74 +98,86 @@ public class Solution {
 			System.out.printf("Alice and Bob tie, each winning %d game(s) and tying %d game(s)\n",bobwin,ties);
 	}
 
+	public static Move BobLogic(Move lastMove,Result result){
+		if (!lastMove.equals(Move.Spock)) return Move.Spock;
+		switch (result){
+			case Win:      return Move.Rock;
+			case Tied:     return Move.Lizard;
+			case Lose:     return Move.Paper;
+		}
+		return null; // should not happen
+	}
+	public static Move AliceLogic(Move lastMove,Result result,Move opMove){
+		if (result.equals(Result.Win)) return lastMove;
+		List<Move> beatMoves = null;
+		switch (result) {
+			case Win: {
+				return lastMove;
+			}
+			case Tied:{
+				beatMoves = lastMove.loseTo();
+				break;
+			}
+			case Lose:{
+				beatMoves = opMove.loseTo();
+			}
+		}
+		Result moveThatWins = calcWinner(beatMoves.get(0), beatMoves.get(1));
+		if (moveThatWins.equals(Result.Win))
+			return beatMoves.get(0);
+		else return beatMoves.get(1);
+	}
+
+	public static BigInteger[] alicesCount;
 	public static void main(String[] args) {
-
-		HashMap<String, Move> hashMap = Move.getHashMap();
-
-//        List<String> nodes=new ArrayList<>();
-//        Map<String,String> Edges=new HashMap<>();
-//        for (Move a : hashMap.values()) {
-//            for (Move b : hashMap.values()) {
-//                nodes.add("("+a.shortname()+","+b.shortname()+")");
-//            }
-//        }
-
-		Scanner scanner=new Scanner(System.in);
+		Scanner scanner = new Scanner(System.in);
 		int tests=scanner.nextInt();
-		for (int j = 0; j < tests; j++) {
-			Move alice=hashMap.get(scanner.next());
-			Move bob=hashMap.get(scanner.next());
+		for (int game = 0; game < tests; game++)
+		{
+			Move alice = Move.getHashMap().get(scanner.next());
+			Move bob = Move.getHashMap().get(scanner.next());
 			BigInteger turns = scanner.nextBigInteger();
-			BigInteger alicewin=BigInteger.ZERO,bobwin=BigInteger.ZERO,ties=BigInteger.ZERO;
-			for (BigInteger i = BigInteger.ZERO; i.compareTo(turns) < 0; i= i.add(BigInteger.ONE)) {
-				if (alice.equals(Move.Lizard)&&(bob.equals(Move.Paper)||bob.equals(Move.Spock))){
-					alicewin= alicewin.add(turns.add(i.negate()));
+
+			alicesCount = new BigInteger[Result.values().length];    // zero the board
+			for (BigInteger play = BigInteger.ZERO; play.compareTo(turns) < 0; play=play.add(BigInteger.ONE))
+			{
+				if (alice.equals(Move.Lizard) && (bob.equals(Move.Paper) || bob.equals(Move.Spock))) {
+					updateResults(Result.Win, turns.add(play.negate()));
 					break;
 				}
-//                System.out.print(i+":\t");
-				Result resulta = calcWinner(alice, bob);
-				Result resultb = null;
-				switch (resulta) {
-					case Win:{
-						alicewin= alicewin.add(BigInteger.ONE);
-						resultb=Result.Lose;
-						break;
-					}
-					case Tied:{
-						ties= ties.add(BigInteger.ONE);
-						resultb=Result.Tied;
-						break;
-					}
-					case Lose:{
-						bobwin= bobwin.add(BigInteger.ONE);
-						resultb=Result.Win;
-						break;
-					}
-				}
+				Result resultA = calcWinner(alice, bob);
+				Result resultB = updateResults(resultA, BigInteger.ONE); // update & get results
 
+				alice = AliceLogic(alice,resultA,bob);    // iterate
+				bob = BobLogic(bob,resultB);
 
-				String s=("("+alice.shortname()+","+bob.shortname()+")");
-
-				alice = AliceLogic(alice,resulta,bob);
-				bob =BobLogic(bob,resultb);
-//                System.out.println(s);
-				if (alice.equals(Move.Paper)&&bob.equals(Move.Paper)){
-					BigInteger left = turns.add(i.negate());
+				if (alice.equals(Move.Paper) && bob.equals(Move.Paper)) {
+					BigInteger left = turns.add(play.negate());
 					BigInteger mod = left.mod(BigInteger.valueOf(4));
 					BigInteger circle = left.add(mod.negate());
 					BigInteger divide = circle.divide(BigInteger.valueOf(4));
-					alicewin= alicewin.add(divide);
-					bobwin= bobwin.add(divide);
-					bobwin= bobwin.add(divide);
-					ties= ties.add(divide);
-					i=turns.add(mod.negate());
+					updateResults(Result.Win, divide);
+					updateResults(Result.Tied, divide);
+					updateResults(Result.Lose, divide.multiply(TWO));
+					play=turns.add(mod.negate());
 				}
-
-//                Edges.put(s,"("+alice.shortname()+","+bob.shortname()+")");
-////                System.out.println("("+alice.shortname()+","+bob.shortname()+")");
-//                System.out.println(s+"="+"("+alice.shortname()+","+bob.shortname()+")"+"="+resulta.name());
 			}
-			printwin(alicewin,bobwin,ties);
+
+			printGameWinner();
 		}
+	}
+
+	public static Result updateResults(Result res, BigInteger toAdd) {
+		setResultCount(res, getResultCount(res).add(toAdd));
+		return res.oponentsResult();
+	}
+
+	public static BigInteger getResultCount(Result res) {
+		if (alicesCount[res.ordinal()] == null)
+			setResultCount(res, BigInteger.ZERO);
+		return alicesCount[res.ordinal()];
+	}
+	public static void setResultCount(Result res, BigInteger val) {
+		alicesCount[res.ordinal()] = val;
 	}
 }
