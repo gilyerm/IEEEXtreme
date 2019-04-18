@@ -9,8 +9,9 @@ import java.util.stream.Collectors;
 
 public class Solution {
 
-	public static final String alphabetBase = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	public static final BigInteger BASE_SIZE = BigInteger.valueOf(alphabetBase.length());
+	public static final char[] alphabetBase =
+			"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
+	public static final BigInteger BaseSize = BigInteger.valueOf(alphabetBase.length);
 	static Scanner scan = new Scanner(System.in);
 
 	public static void main(String... args) {
@@ -24,7 +25,6 @@ public class Solution {
 			byte[] xor = xORUrls(baseURLArr, targetURLArr);
 			System.out.printf("%s/%s\n", baseURL, toBase62(xor));
 		}
-
 	}
 
 	public static byte[] asByteArr(String str) {
@@ -33,33 +33,24 @@ public class Solution {
 
 	public static byte[] xORUrls(byte[] baseURLArr, byte[] targetURLArr) {
 		byte[] xor = new byte[8];
-		int first, last;
-		first = last = 0;
+		int last;
 
-		/// IF targetURL < baseURL (target shorter than base)
-		if (targetURLArr.length <= baseURLArr.length) {
-			last = targetURLArr.length;	// truncate baseURL to make lengths equal.
-			first = last - 8;
-		}
-
-		else {	// IF baseURL < targetUrl (base shorter than target)
+		if (baseURLArr.length < targetURLArr.length) {	// IF baseURL < targetUrl (base shorter than target)
 			byte[] repeatBase = Arrays.copyOf(baseURLArr, targetURLArr.length);
 			for (int i=baseURLArr.length; i<repeatBase.length; i++)
-				repeatBase[i] = baseURLArr[i%baseURLArr.length];	// repeat baseURL as needed to make lengths equal.
+				repeatBase[i] = baseURLArr[i%baseURLArr.length]; // repeat baseURL as needed until lengths equal.
 			baseURLArr = repeatBase;
-
-			last = repeatBase.length;
-			first = last - 8;
 		}
 
-		// THEN xor the 2 8-byte ranges
-		byte[] target8 = Arrays.copyOfRange(targetURLArr, first, last);
-		byte[] base8 = Arrays.copyOfRange(baseURLArr, first, last);
-		for (int i=0; i<8; i++)
-			xor[i] = (byte)(target8[i] ^ base8[i]);
+		last = targetURLArr.length;	// "truncate"/limit baseURL to the targetUrl length.
+		byte[] target8 = Arrays.copyOfRange(targetURLArr, last-8, last);
+		byte[] base8 = Arrays.copyOfRange(baseURLArr, last-8, last);
+		for (int i=0; i<8; i++) {	// xor the 2 8-byte ranges
+			xor[i] = (byte) (target8[i] ^ base8[i]);
+		}
 
 		logThing("--------");
-		logThing(String.format("f=%d, l=%d", first, last));
+		logThing(String.format("f=%d, l=%d", last-8, last));
 		logArr("B_full", baseURLArr);
 		logArr("T_full", targetURLArr);
 
@@ -74,7 +65,7 @@ public class Solution {
 		logThing(String.format("%s %s (%d)", title, ArrayToString(arr), arr.length));
 	}
 	public static void logThing(String s) {
-		System.out.println(s);
+		// System.out.println(s);
 	}
 	public static String ArrayToString(byte[] arr) {
 		ArrayList<Byte> arrayList = new ArrayList<>();
@@ -86,25 +77,15 @@ public class Solution {
 	}
 
 	public static String toBase62(byte[] xor) {
-		BigInteger base10Val = BigInteger.ZERO;
-		for (int j=0; j<xor.length; j++) {
-			byte b = xor[j];
-			// logThing(String.format("%02x,",b));
-			base10Val = base10Val.add(BigInteger.valueOf(b));
-			base10Val = base10Val.shiftLeft(8);
-		}
-		base10Val = base10Val.shiftRight(8);
-
+		BigInteger base10Val = new BigInteger(xor);
 		StringBuilder sb = new StringBuilder();
 		while (base10Val.compareTo(BigInteger.ZERO) != 0) {
-			int mod = base10Val.mod(BASE_SIZE).intValue();
-			char digit = alphabetBase.charAt(mod);
+			int mod = base10Val.mod(BaseSize).intValue();
+			char digit = alphabetBase[mod];
 			sb.append(digit);
-			base10Val = base10Val.divide(BASE_SIZE);
+			base10Val = base10Val.divide(BaseSize);
 		}
-		if (sb.length() == 0)
-			sb.append(0);
-
+		if (sb.length() == 0) sb.append(0);
 		return sb.reverse().toString();
 	}
 }
