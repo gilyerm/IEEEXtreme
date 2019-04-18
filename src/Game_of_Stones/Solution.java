@@ -20,15 +20,10 @@ public class Solution {
 					BigInteger mod = stones.mod(BigInteger.valueOf(4));
 					if (mod.compareTo(BigInteger.valueOf(3)) == 0) // good 4 current player
 						turn = 1 - turn; // opponent "gets" next turn
-                /*    else if (mod.compareTo(BigInteger.valueOf(1)) == 0) // good 4 the opponent
-                        ; // you keep your turn.
-                    else
-                        System.out.println("error - even number input");    */
 				}
 			}
 			int winner = 1 - turn;
 			System.out.println(players[winner]);
-			//System.out.printf("game winner: %s\n", players[winner]);
 		}
 	}
 }
