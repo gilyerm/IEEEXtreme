@@ -9,21 +9,24 @@ public class Solution {
 	static HashMap<Character, Point> points = new HashMap<>();
 	public static void main (String[] args) {
 		double r = scan.nextDouble();
-		System.out.println(r);
+// 		System.out.println(r);
 		for (int i=0; i<26; i++) {
 			Character letter = scan.next().charAt(0);
 			double angle = scan.nextDouble();
-			System.out.printf("%c %f\n", letter, angle);
+// 			System.out.printf("%c %f\n", letter, angle);
 			points.put(letter, new Point(r, angle));
 		}
-
-		points.entrySet().stream().forEach(System.out::println);
+// 		points.entrySet().stream().forEach(System.out::println);
 
 		StringBuilder sb = new StringBuilder();
 		while(scan.hasNext()) sb.append(scan.next());
 		String message = sb.toString().replaceAll("[^a-zA-Z]", "").toUpperCase();
-		System.out.println(message);
-		System.out.println(Math.ceil(calcThreadLength(message)));
+// 		System.out.println(message);
+		System.out.println((long)Math.ceil(calcThreadLength(message)));
+// 		System.out.println();
+// 		System.out.println(points.get('G').distance(
+// 		    points.get('R')
+// 		    ));
 	}
 
 	static double calcThreadLength(String message) {
@@ -32,13 +35,15 @@ public class Solution {
 		ArrayList<Point> path = new ArrayList<>();
 		path.add(Point.CENTER);
 		char prev='\0';
-		for (int i=0; i < arr.length; prev=arr[i], i++) {
+		for (int i=0; i < arr.length; i++) {
 			char cur = arr[i];
 			if (prev == cur)
-				path.add(Point.CENTER);
+				continue; //path.add(Point.CENTER);
 			path.add(points.get(cur));
+			prev = cur;
 		}
-// 		path.add(Aeneas_cryptographic_disc.Point.CENTER);
+// 		path.add(Point.CENTER);
+		// System.out.println(path.size());
 		return totalDistance(path);
 	}
 
@@ -54,8 +59,9 @@ public class Solution {
 class Point {
 	double x,y;
 	Point(double r, double angle) {
-		this.x = Math.cos(angle) * r;
-		this.y = Math.sin(angle) * r;
+		double rad = Math.toRadians(angle);
+		this.x = Math.cos(rad) * r;
+		this.y = Math.sin(rad) * r;
 	}
 	public static Point CENTER = new Point(0,0);
 	public double distance(Point p) {
@@ -63,6 +69,6 @@ class Point {
 	}
 	@Override
 	public String toString() {
-		return String.format("{x=%d\t,y=%d}",x,y);
+		return String.format("{x=%f,y=%f}",x,y);
 	}
 }
