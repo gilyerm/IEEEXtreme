@@ -1,24 +1,30 @@
 # IEEEXtreme
 
-
-
-* Aeneas_cryptographic_disc
-* Back_to_Square_1	
-* Batbears_Bubbles_challenge
-* Bear_Sums
-* Bit_Soccer
-* Blackgate_Penitentiary
-* Cheer_Up_Bob
-* Dog_Walking
-* Dr_Fibonacci
-* Game_of_Stones
-* Goldbachs_Second_Conjecture
-* Kabloom	Works
-* RecXor
-* Rumour_FullBinaryTree
-* Running_Up_Stairs
-* Sheldons_Favorite_Game
-* Shortening_in_the_Real_World
-* Taco_Stand
-* Troll_Coder
-* Xtreme_Fake_Coins
+Challenge | Lang
+--- | ---
+Aeneas cryptographic disc | `java`
+Back to Square 1 | `cpp`
+Barrett Reduction | `cpp`
+Batbears Bubbles challenge | `cpp`
+Bear Sums | `java`
+Bit Soccer | `cpp`
+Blackgate Penitentiary | `js`
+Cheer Up Bob | `java`
+Dog Walking | `js`
+Dr Fibonacci | `cpp`
+Drawing Rooted Binary Trees | `java`
+Game of Stones | `java`
+Goldbachs Second Conjecture | `java`
+Gotta Catch Em All 11 | `cpp`
+Kabloom | `cpp`
+Lemons | `py`
+Math Challenge | `cpp`
+RecXor | `java`
+Rumour FullBinaryTree | `cpp`
+Running Up Stairs | `java`
+Sheldons Favorite Game | `java`
+Shortening in the Real World | `java`
+Taco Stand | `cpp`
+Telescope-Scheduling | `cpp`
+Troll Coder | `cpp`
+Xtreme Fake Coins | `java`
